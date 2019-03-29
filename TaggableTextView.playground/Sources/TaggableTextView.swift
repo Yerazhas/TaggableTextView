@@ -5,8 +5,12 @@ class TaggableTextView: UITextView {
     private var callBack: ((String, WordType) -> ())?
     private var attrString = NSMutableAttributedString()
     private var textString = NSString()
+    private let hashTagColor: UIColor
+    private let mentionColor: UIColor
     
-    init() {
+    init(hashTagColor: UIColor, mentionColor: UIColor) {
+        self.hashTagColor = hashTagColor
+        self.mentionColor = mentionColor
         super.init(frame: .zero, textContainer: nil)
         delegate = self
     }
@@ -15,7 +19,11 @@ class TaggableTextView: UITextView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setText(text: String, withHashtagColor hashtagColor: UIColor, andMentionColor mentionColor: UIColor, andCallBack callBack: @escaping (String, WordType) -> ()) {
+    func setText(text: String, callBack: @escaping (String, WordType) -> ()) {
+        setText(text: text, withHashtagColor: hashTagColor, andMentionColor: mentionColor, andCallBack: callBack)
+    }
+    
+    private func setText(text: String, withHashtagColor hashtagColor: UIColor, andMentionColor mentionColor: UIColor, andCallBack callBack: @escaping (String, WordType) -> ()) {
         self.callBack = callBack
         let attrString = NSMutableAttributedString(string: text)
         self.attrString = attrString
@@ -31,15 +39,11 @@ class TaggableTextView: UITextView {
         addGestureRecognizer(tapper)
     }
     
-    func defaultAction() {
-        print("default action!!!!!!!")
-    }
-    
     private func setAttrWithName(_ attrName: String, wordPrefix: String, color: UIColor, text: String) {
         let words = text.components(separatedBy: " ")
         
         for word in words.filter({$0.hasPrefix(wordPrefix)}) {
-            if word.first == word.last, word.first! == "@" {
+            if word.startIndex == word.endIndex, word.first! == "@" {
                 customDelegate?.didBeginMentioning()
             }
             let range = textString.range(of: word)
