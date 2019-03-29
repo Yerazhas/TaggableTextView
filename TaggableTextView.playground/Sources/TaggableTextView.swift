@@ -2,7 +2,6 @@ import UIKit
 
 class TaggableTextView: UITextView {
     weak var customDelegate: TaggableTextViewDelegate?
-    var mentioningStartAction: (() -> ())?
     private var callBack: ((String, WordType) -> ())?
     private var attrString = NSMutableAttributedString()
     private var textString = NSString()
